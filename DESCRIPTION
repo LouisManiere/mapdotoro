@@ -1,15 +1,19 @@
 Package: mapdotoro
-Version: 0.0.0.9000
 Title: Mapdo Data Processing
-Description: A package to make the data processing for the mapdoapp shiny application.
-Authors@R: person(given = "Louis",
-       family = "Manière",
-       role = c("aut", "cre"),
-       email = "louis.maniere@ens-lyon.fr",
-       comment = c(ORCID = "0000-0003-0426-2975"))
+Version: 0.0.0.9000
+Authors@R: 
+    person("Louis", "Manière", , "louis.maniere@ens-lyon.fr", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0426-2975"))
+Description: A package to make the data processing for the mapdoapp shiny
+    application.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
 URL: https://github.com/LouisManiere/mapdotoro
 BugReports: https://github.com/LouisManiere/mapdotoro/issues
+Depends: 
+    R (>= 2.10)
+Imports: 
+    magrittr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
