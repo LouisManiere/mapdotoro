@@ -136,8 +136,8 @@ file.copy(from = "C:/Users/lmanie01/Documents/Ressources/formation_R_thinkR/doss
           overwrite = TRUE)
 
 # add raw csv data to inst
-file.copy(from = "C:/Users/lmanie01/Documents/Ressources/formation_R_thinkR/dossiers_rstudio/data/nyc_squirrels_act_sample.csv",
-          to = "inst/nyc_squirrels_act_sample.csv",
+file.copy(from = "C:/Users/lmanie01/Documents/Gitlab/mapdotoro/data-raw/network_continuity_data.gpkg",
+          to = "inst/network_continuity_data.gpkg",
           overwrite = TRUE)
 ```
 
