@@ -201,5 +201,4 @@ data-raw/network_with_attribut.gpkg
 data-raw/old_datsf.gpkg
 data-raw/ref_hydro_network.gpkg
 data-raw/rmc_network.gpkg
-data-raw/rmc_network.R
 data-raw/swaths_refaxis_combine.gpkg
