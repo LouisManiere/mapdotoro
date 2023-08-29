@@ -202,4 +202,8 @@ data-raw/old_datsf.gpkg
 data-raw/ref_hydro_network.gpkg
 data-raw/rmc_network.gpkg
 data-raw/swaths_refaxis_combine.gpkg
+data-raw/continuity_data.csv
+data-raw/metrics_data.csv
+data-raw/landcover_data.csv
+
 docs

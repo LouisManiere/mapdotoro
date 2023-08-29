@@ -230,7 +230,41 @@ st_write(network_clip, "data-raw/network_clip.gpkg", "network_clip", append = FA
 # read network clipped
 network_clip <- st_read("data-raw/network_clip.gpkg")
 
+### Subset data to data folder ####
+network_data <- network_clip %>%
+  filter(AXIS== 13 | AXIS==17) %>%
+  st_transform(4326)
 
+metrics_data <- metrics_combine %>%
+  filter(AXIS== 13 | AXIS==17)
+
+continuity_data <- continuity_combine %>%
+  filter(AXIS== 13 | AXIS==17)
+
+landcover_data <- landcover_combine %>%
+  filter(AXIS== 13 | AXIS==17)
+
+st_write(network_data, "data-raw/network_data.gpkg", "network_data", append = FALSE)
+write.csv2(metrics_data, "data-raw/metrics_data.csv")
+write.csv2(continuity_data, "data-raw/continuity_data.csv")
+write.csv2(landcover_data, "data-raw/landcover_data.csv")
+
+# put the data to data folder
+usethis::use_data(network_data, overwrite = TRUE)
+usethis::use_data(metrics_data, overwrite = TRUE)
+usethis::use_data(continuity_data, overwrite = TRUE)
+usethis::use_data(landcover_data, overwrite = TRUE)
+# add data documentation R in R folder
+checkhelper::use_data_doc(name = "network_data")
+checkhelper::use_data_doc(name = "metrics_data")
+checkhelper::use_data_doc(name = "continuity_data")
+checkhelper::use_data_doc(name = "landcover_data")
+# regenerate all the package documentation to create the md data doc from the R data doc, store in man folder
+attachment::att_amend_desc()
+
+
+
+###### OLD ######
 ### join metrics, continuity and landcover to network clipped => write network_metrics.gpkg, network_continuity.gpkg, network_landcover.gpkg ####
 network_metrics <- network_clip %>%
   left_join(metrics_combine, by = join_by("AXIS"=="AXIS", "M"=="measure"),
