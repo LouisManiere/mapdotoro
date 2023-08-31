@@ -3,11 +3,7 @@
 .RData
 .DS_Store
 .httr-oauth
-data-raw/network_clip.gpkg
 data-raw/datsf.rda
-data-raw/landcover_combine.csv
-data-raw/continuity_combine.csv
-data-raw/metrics_combine.csv
 data-raw/AX0001/continuity.csv
 data-raw/AX0001/historic.csv
 data-raw/AX0001/landcover.csv
@@ -207,3 +203,7 @@ data-raw/metrics_data.csv
 data-raw/landcover_data.csv
 
 docs
+data-raw/continuity.csv
+data-raw/landcover.csv
+data-raw/metrics.csv
+data-raw/network.gpkg

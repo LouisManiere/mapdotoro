@@ -149,15 +149,15 @@ continuity_combine <- merge_csv_in_subfolders(folder = "data-raw/", pattern_file
 metrics_combine <- merge_csv_in_subfolders(folder = "data-raw/", pattern_file = "metrics.csv", pattern_subfolders = "AX")
 landcover_combine <- merge_csv_in_subfolders(folder = "data-raw/", pattern_file = "landcover.csv", pattern_subfolders = "AX")
 
-write.csv2(continuity_combine, "data-raw/continuity_combine.csv")
-write.csv2(metrics_combine, "data-raw/metrics_combine.csv")
-write.csv2(landcover_combine, "data-raw/landcover_combine.csv")
+write.csv2(continuity_combine, "data-raw/continuity.csv")
+write.csv2(metrics_combine, "data-raw/metrics.csv")
+write.csv2(landcover_combine, "data-raw/landcover.csv")
 #####
 
 # read metrics
-continuity_combine <- read.csv2("data-raw/continuity_combine.csv")
-metrics_combine <- read.csv2("data-raw/metrics_combine.csv")
-landcover_combine <- read.csv2("data-raw/landcover_combine.csv")
+continuity_combine <- read.csv2("data-raw/continuity.csv")
+metrics_combine <- read.csv2("data-raw/metrics.csv")
+landcover_combine <- read.csv2("data-raw/landcover.csv")
 
 
 ### load old simplify network => write old_datsf.gpkg ####
@@ -210,7 +210,8 @@ for (axis in unique(network_with_attribut$AXIS)){
     filter(AXIS == axis) # get ref_hydro_format lines by axis
   network_clip_axis <- network_axe %>%
     st_intersection(dgo_axe) %>%  # clip by axis (keep only lines inside swaths)
-    select(-AXIS.1)
+    select(-AXIS.1) %>%
+    st_transform(4326)
   network_clip <- rbind(network_clip, network_clip_axis) # fill the output dataset by axis
 }
 
@@ -224,16 +225,15 @@ for (axis in unique(network_with_attribut$AXIS)){
 #   }
 # }
 
-st_write(network_clip, "data-raw/network_clip.gpkg", "network_clip", append = FALSE)
+st_write(network_clip, "data-raw/network.gpkg", "network_clip", append = FALSE)
 #####
 
 # read network clipped
-network_clip <- st_read("data-raw/network_clip.gpkg")
+network_clip <- st_read("data-raw/network.gpkg")
 
 ### Subset data to data folder ####
 network_data <- network_clip %>%
-  filter(AXIS== 13 | AXIS==17) %>%
-  st_transform(4326)
+  filter(AXIS== 13 | AXIS==17)
 
 metrics_data <- metrics_combine %>%
   filter(AXIS== 13 | AXIS==17)
@@ -259,56 +259,5 @@ checkhelper::use_data_doc(name = "network_data")
 checkhelper::use_data_doc(name = "metrics_data")
 checkhelper::use_data_doc(name = "continuity_data")
 checkhelper::use_data_doc(name = "landcover_data")
-# regenerate all the package documentation to create the md data doc from the R data doc, store in man folder
-attachment::att_amend_desc()
-
-
-
-###### OLD ######
-### join metrics, continuity and landcover to network clipped => write network_metrics.gpkg, network_continuity.gpkg, network_landcover.gpkg ####
-network_metrics <- network_clip %>%
-  left_join(metrics_combine, by = join_by("AXIS"=="AXIS", "M"=="measure"),
-            suffix = c("", ".metrics"), relationship="one-to-one")
-
-network_continuity <- network_clip %>%
-  left_join(continuity_combine, by = join_by("AXIS"=="AXIS", "M"=="measure"),
-            suffix = c("", ".continuity"), relationship="one-to-many")
-
-network_landcover <- network_clip %>%
-  left_join(landcover_combine, by = join_by("AXIS"=="AXIS", "M"=="measure"),
-            suffix = c("", ".landcover"), relationship="one-to-many")
-
-st_write(network_metrics, "data-raw/network_metrics.gpkg", "network_metrics", append = FALSE)
-st_write(network_continuity, "data-raw/network_continuity.gpkg", "network_continuity", append = FALSE)
-st_write(network_landcover, "data-raw/network_landcover.gpkg", "network_landcover", append = FALSE)
-#####
-
-# read network with joined data (metrics, continuity, landcover)
-network_metrics <- st_read("data-raw/network_metrics.gpkg")
-network_continuity <- st_read("data-raw/network_continuity.gpkg")
-network_landcover <- st_read("data-raw/network_landcover.gpkg")
-
-### Subset data to data folder ####
-network_metrics_data <- network_metrics %>%
-  filter(AXIS== 13 | AXIS==17)
-
-network_continuity_data <- network_continuity %>%
-  filter(AXIS== 13 | AXIS==17)
-
-network_landcover_data <- network_landcover %>%
-  filter(AXIS== 13 | AXIS==17)
-
-st_write(network_metrics_data, "data-raw/network_metrics_data.gpkg", "network_metrics_data", append = FALSE)
-st_write(network_continuity_data, "data-raw/network_continuity_data.gpkg", "network_continuity_data", append = FALSE)
-st_write(network_landcover_data, "data-raw/network_landcover_data.gpkg", "network_landcover_data", append = FALSE)
-
-# put the data to
-usethis::use_data(network_metrics_data, overwrite = TRUE)
-usethis::use_data(network_continuity_data, overwrite = TRUE)
-usethis::use_data(network_landcover_data, overwrite = TRUE)
-# add data documentation R in R folder
-checkhelper::use_data_doc(name = "network_metrics_data")
-checkhelper::use_data_doc(name = "network_continuity_data")
-checkhelper::use_data_doc(name = "network_landcover_data")
 # regenerate all the package documentation to create the md data doc from the R data doc, store in man folder
 attachment::att_amend_desc()
