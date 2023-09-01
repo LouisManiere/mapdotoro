@@ -97,7 +97,8 @@ swaths_refaxis_combine <- do.call(rbind, liste_swaths_refaxis)
 #####
 
 # read swaths
-swaths_refaxis_combine <- st_read("data-raw/swaths_refaxis_combine.gpkg")
+swaths_refaxis_combine <- st_read("data-raw/swaths_refaxis_combine.gpkg") %>%
+  st_transform(2154)
 
 ### merge all continuity, metrics, landcover => write continuity_combine.csv, metrics_combine.csv, landcover_combine.csv ####
 merge_csv_in_subfolders <- function(folder, pattern_file, pattern_subfolders){
@@ -173,7 +174,7 @@ st_write(old_datsf, "data-raw/old_datsf.gpkg", "old_datsf", append = FALSE)
 #####
 
 # read old simplify network
-st_read("data-raw/old_datsf.gpkg")
+datsf <- st_read("data-raw/old_datsf.gpkg")
 
 ### load reference hydrological network and get attribut from old network => write network_with_attibut.gpkg ####
 
@@ -188,12 +189,12 @@ network_axis <- network %>%
             geometry = st_union(geometry))
 
 # get the initial simplify network (datasf) attributs
-network_with_attibut <-  network_axis %>%
+network_with_attribut <-  network_axis %>%
  left_join(as.data.frame(datsf), by = join_by(TOPONYME == TOPONYME)) %>%
   select(num, ID, AXIS, popup, TOPONYME, hasData, geometry.x)
-st_geometry(network_with_attibut) <- "geometry"
+st_geometry(network_with_attribut) <- "geometry"
 
-st_write(network_with_attibut, "data-raw/network_with_attribut.gpkg", "network", append = FALSE)
+st_write(network_with_attribut, "data-raw/network_with_attribut.gpkg", "network", append = FALSE)
 #####
 
 network_with_attribut <- st_read("data-raw/network_with_attribut.gpkg")
@@ -210,8 +211,7 @@ for (axis in unique(network_with_attribut$AXIS)){
     filter(AXIS == axis) # get ref_hydro_format lines by axis
   network_clip_axis <- network_axe %>%
     st_intersection(dgo_axe) %>%  # clip by axis (keep only lines inside swaths)
-    select(-AXIS.1) %>%
-    st_transform(4326)
+    select(-AXIS.1)
   network_clip <- rbind(network_clip, network_clip_axis) # fill the output dataset by axis
 }
 
@@ -225,14 +225,18 @@ for (axis in unique(network_with_attribut$AXIS)){
 #   }
 # }
 
-st_write(network_clip, "data-raw/network.gpkg", "network_clip", append = FALSE)
-#####
+# st_write(network_clip, "data-raw/network.gpkg", "network_clip", append = FALSE)
+####
 
 # read network clipped
 network_clip <- st_read("data-raw/network.gpkg")
 
+# strahler order done by hand
+# read network with strahler order
+network_strahler <- st_read("data-raw/network_strahler.gpkg")
+
 ### Subset data to data folder ####
-network_data <- network_clip %>%
+network_data <- network_strahler %>%
   filter(AXIS== 13 | AXIS==17)
 
 metrics_data <- metrics_combine %>%
