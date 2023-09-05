@@ -235,6 +235,11 @@ network_clip <- st_read("data-raw/network.gpkg")
 # read network with strahler order
 network_strahler <- st_read("data-raw/network_strahler.gpkg")
 
+# write final scv file to copy without subset
+write.csv2(continuity_combine, "data-raw/continuity.csv")
+write.csv2(metrics_combine, "data-raw/metrics.csv")
+write.csv2(landcover_combine, "data-raw/landcover.csv")
+
 ### Subset data to data folder ####
 network_data <- network_strahler %>%
   filter(AXIS== 13 | AXIS==17)
