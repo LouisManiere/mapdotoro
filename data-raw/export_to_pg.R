@@ -19,10 +19,12 @@ network_strahler <- st_read("data-raw/network_strahler.gpkg")
 continuity <- read.csv2("data-raw/continuity.csv")
 metrics <- read.csv2("data-raw/metrics.csv")
 landcover <- read.csv2("data-raw/landcover.csv")
+network_metrics <- st_read("data-raw/network_landcover_metrics.gpkg")
 
 st_write(network_strahler, con, "network", driver = "PostgreSQL")
 dbWriteTable(con, "continuity", continuity, overwrite = TRUE, row.names = FALSE)
 dbWriteTable(con, "metrics", metrics, overwrite = TRUE, row.names = FALSE)
 dbWriteTable(con, "landcover", landcover, overwrite = TRUE, row.names = FALSE)
+st_write(network_metrics, con, "network_metrics", driver = "PostgreSQL")
 
 dbDisconnect(con)

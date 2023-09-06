@@ -4,6 +4,7 @@ library(sf)
 library(stringr)
 library(glue)
 library(dplyr)
+library(tidyr)
 
 ### extract network axis from reference hydrological network ####
 # get real BDTOPO 2021 network with DGO
@@ -160,7 +161,6 @@ continuity_combine <- read.csv2("data-raw/continuity.csv")
 metrics_combine <- read.csv2("data-raw/metrics.csv")
 landcover_combine <- read.csv2("data-raw/landcover.csv")
 
-
 ### load old simplify network => write old_datsf.gpkg ####
 load(file="data-raw/datsf.rda")
 # old style crs, rewrite with WKT, not proj4string
@@ -240,33 +240,36 @@ write.csv2(continuity_combine, "data-raw/continuity.csv")
 write.csv2(metrics_combine, "data-raw/metrics.csv")
 write.csv2(landcover_combine, "data-raw/landcover.csv")
 
-### Subset data to data folder ####
-network_data <- network_strahler %>%
-  filter(AXIS== 13 | AXIS==17)
+### combine network to metrics and landcover ####
 
-metrics_data <- metrics_combine %>%
-  filter(AXIS== 13 | AXIS==17)
+# create unique id to network
+network_strahler_id <- network_strahler %>%
+  mutate(id_net = row_number())
 
-continuity_data <- continuity_combine %>%
-  filter(AXIS== 13 | AXIS==17)
+# join with landcover
+network_landcover_join <- network_strahler_id %>%
+  left_join(landcover_combine, by = c("M"="measure", "AXIS"="AXIS"))
 
-landcover_data <- landcover_combine %>%
-  filter(AXIS== 13 | AXIS==17)
+# remove geom and pivot landcover to have all the area by landcover type
+landcover_pivot <- network_landcover_join %>%
+  st_drop_geometry() %>%
+  select(id_net, landcover, landcover_area) %>%
+  pivot_wider(names_from = landcover, values_from = landcover_area) %>%
+  rename_with(~str_replace_all(., " ", "_"), everything())
 
-st_write(network_data, "data-raw/network_data.gpkg", "network_data", append = FALSE)
-write.csv2(metrics_data, "data-raw/metrics_data.csv")
-write.csv2(continuity_data, "data-raw/continuity_data.csv")
-write.csv2(landcover_data, "data-raw/landcover_data.csv")
+# add pivot landuse and metrics to network
+network_landcover_metrics <- network_strahler_id %>%
+  left_join(landcover_pivot, by = c("id_net"="id_net")) %>%
+  left_join(metrics_combine, by= c("M"="measure", "AXIS"="AXIS"))
+
+# write final network dataset
+st_write(network_landcover_metrics, "data-raw/network_landcover_metrics.gpkg", "network_landcover_metrics", append = FALSE)
+
+### USE BELOW TO SAVE TO DATA FOLDER WITH DOC ####
 
 # put the data to data folder
 usethis::use_data(network_data, overwrite = TRUE)
-usethis::use_data(metrics_data, overwrite = TRUE)
-usethis::use_data(continuity_data, overwrite = TRUE)
-usethis::use_data(landcover_data, overwrite = TRUE)
 # add data documentation R in R folder
 checkhelper::use_data_doc(name = "network_data")
-checkhelper::use_data_doc(name = "metrics_data")
-checkhelper::use_data_doc(name = "continuity_data")
-checkhelper::use_data_doc(name = "landcover_data")
 # regenerate all the package documentation to create the md data doc from the R data doc, store in man folder
 attachment::att_amend_desc()
