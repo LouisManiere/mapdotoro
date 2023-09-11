@@ -257,7 +257,11 @@ landcover_pivot <- network_landcover_join %>%
   select(id_net, landcover, landcover_area) %>%
   mutate(landcover_area = landcover_area/10000) %>% # convert m2 to ha
   pivot_wider(names_from = landcover, values_from = landcover_area) %>%
-  rename_with(~str_replace_all(., " ", "_"), everything())
+  rename_with(~str_replace_all(., " ", "_"), everything())%>%
+  mutate(sum_area = rowSums(select(., Crops, Dense_Urban, Diffuse_Urban,
+                                              Forest, Grassland, Gravel_Bars,
+                                              Infrastructures, Natural_Open,
+                                              Water_Channel), na.rm = TRUE))
 
 ### CONTINUITY PREPARATION
 network_continuity_join <- network_strahler_id %>%
