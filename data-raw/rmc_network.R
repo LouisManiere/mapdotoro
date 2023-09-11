@@ -247,7 +247,7 @@ network_strahler_id <- network_strahler %>%
   mutate(id_net = row_number())
 
 ### LANDCOVER PREPARATION
-# join with landcover
+# join with landcover and set area in ha
 network_landcover_join <- network_strahler_id %>%
   left_join(landcover_combine, by = c("M"="measure", "AXIS"="AXIS"))
 
@@ -255,6 +255,7 @@ network_landcover_join <- network_strahler_id %>%
 landcover_pivot <- network_landcover_join %>%
   st_drop_geometry() %>%
   select(id_net, landcover, landcover_area) %>%
+  mutate(landcover_area = landcover_area/10000) %>% # convert m2 to ha
   pivot_wider(names_from = landcover, values_from = landcover_area) %>%
   rename_with(~str_replace_all(., " ", "_"), everything())
 
@@ -266,6 +267,7 @@ network_continuity_join <- network_strahler_id %>%
 continuity_pivot <- network_continuity_join %>%
   st_drop_geometry() %>%
   select(id_net, continuity, continuity_area) %>%
+  mutate(continuity_area = continuity_area/10000) %>% # convert m2 to ha
   pivot_wider(names_from = continuity, values_from = continuity_area) %>%
   rename_with(~str_replace_all(., " ", "_"), everything()) %>%
   rename_with(~str_replace_all(., "-", "_"), everything())
