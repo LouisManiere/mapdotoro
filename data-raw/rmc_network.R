@@ -246,6 +246,7 @@ write.csv2(landcover_combine, "data-raw/landcover.csv")
 network_strahler_id <- network_strahler %>%
   mutate(id_net = row_number())
 
+### LANDCOVER PREPARATION
 # join with landcover
 network_landcover_join <- network_strahler_id %>%
   left_join(landcover_combine, by = c("M"="measure", "AXIS"="AXIS"))
@@ -257,13 +258,29 @@ landcover_pivot <- network_landcover_join %>%
   pivot_wider(names_from = landcover, values_from = landcover_area) %>%
   rename_with(~str_replace_all(., " ", "_"), everything())
 
+### CONTINUITY PREPARATION
+network_continuity_join <- network_strahler_id %>%
+  left_join(continuity_combine, by = c("M"="measure", "AXIS"="AXIS"))
+
+# remove geom and pivot continuity to have all the area by continuity type
+continuity_pivot <- network_continuity_join %>%
+  st_drop_geometry() %>%
+  select(id_net, continuity, continuity_area) %>%
+  pivot_wider(names_from = continuity, values_from = continuity_area) %>%
+  rename_with(~str_replace_all(., " ", "_"), everything()) %>%
+  rename_with(~str_replace_all(., "-", "_"), everything())
+
 # add pivot landuse and metrics to network
-network_landcover_metrics <- network_strahler_id %>%
+network_landcover_continuity_metrics <- network_strahler_id %>%
   left_join(landcover_pivot, by = c("id_net"="id_net")) %>%
+  left_join(continuity_pivot, by = c("id_net"="id_net")) %>%
   left_join(metrics_combine, by= c("M"="measure", "AXIS"="AXIS"))
 
 # write final network dataset
-st_write(network_landcover_metrics, "data-raw/network_landcover_metrics.gpkg", "network_landcover_metrics", append = FALSE)
+st_write(network_landcover_continuity_metrics, "data-raw/network_landcover_continuity_metrics.gpkg", "network_landcover_continuity_metrics", append = FALSE)
+
+# read final network dataset
+network_landcover_metrics <- st_read("data-raw/network_landcover_continuity_metrics.gpkg")
 
 ### USE BELOW TO SAVE TO DATA FOLDER WITH DOC ####
 
