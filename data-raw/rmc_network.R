@@ -295,6 +295,22 @@ st_write(network_landcover_continuity_metrics, "data-raw/network_landcover_conti
 # read final network dataset
 network_landcover_metrics <- st_read("data-raw/network_landcover_continuity_metrics.gpkg")
 
+### AXIS
+
+# network axes
+network_axis <- network_strahler %>%
+  group_by(AXIS) %>%
+  summarise(geometry = st_union(geom)) %>%
+  mutate(id_net = row_number())
+
+# write final network dataset
+st_write(network_axis, "data-raw/network_axis.gpkg", "network_axis", append = FALSE)
+
+# read final network dataset
+network_axis <- st_read("data-raw/network_axis.gpkg")
+
+
+
 ### USE BELOW TO SAVE TO DATA FOLDER WITH DOC ####
 
 # put the data to data folder
