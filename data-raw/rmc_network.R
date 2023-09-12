@@ -280,7 +280,14 @@ continuity_pivot <- network_continuity_join %>%
 network_landcover_continuity_metrics <- network_strahler_id %>%
   left_join(landcover_pivot, by = c("id_net"="id_net")) %>%
   left_join(continuity_pivot, by = c("id_net"="id_net")) %>%
-  left_join(metrics_combine, by= c("M"="measure", "AXIS"="AXIS"))
+  left_join(metrics_combine, by= c("M"="measure", "AXIS"="AXIS")) %>%
+  mutate(idx_confinement = ifelse(is.na(active_channel_width) |
+                                    is.na(valley_bottom_width) |
+                                    valley_bottom_width == 0, NA,
+                                    active_channel_width /
+                                    valley_bottom_width))
+
+
 
 # write final network dataset
 st_write(network_landcover_continuity_metrics, "data-raw/network_landcover_continuity_metrics.gpkg", "network_landcover_continuity_metrics", append = FALSE)
