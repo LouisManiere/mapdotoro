@@ -201,6 +201,7 @@ data-raw/swaths_refaxis_combine.gpkg
 data-raw/continuity_data.csv
 data-raw/metrics_data.csv
 data-raw/landcover_data.csv
+data-raw/dbmapdo.gpkg
 
 docs
 data-raw/continuity.csv
