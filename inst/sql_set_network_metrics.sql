@@ -32,11 +32,11 @@ ON network_metrics USING btree(fid);
 CREATE INDEX idx_geom_network_metrics
 ON network_metrics USING GIST (geom);
 
--- Ajouter la colonne gid_region à la table network_metrics
+-- add gid_region
 ALTER TABLE network_metrics
 ADD COLUMN gid_region integer;
 
--- Mettre à jour la colonne gid_region en utilisant une jointure spatiale
+-- update gid_region with spatial join
 UPDATE network_metrics AS nm
 SET gid_region = rh.gid
 FROM region_hydrographique AS rh
