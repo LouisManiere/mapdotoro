@@ -13,6 +13,13 @@ con <- DBI::dbConnect(RPostgres::Postgres(),
                       user      = Sys.getenv("DBMAPDO_USER"),
                       password  = Sys.getenv("DBMAPDO_PASS"))
 
+# con <- DBI::dbConnect(RPostgres::Postgres(),
+#                       host = Sys.getenv("DBMAPDO_DEV_HOST"),
+#                       port = Sys.getenv("DBMAPDO_DEV_PORT"),
+#                       dbname = Sys.getenv("DBMAPDO_DEV_NAME"),
+#                       user      = Sys.getenv("DBMAPDO_DEV_USER"),
+#                       password  = Sys.getenv("DBMAPDO_DEV_PASS"))
+
 bassin_hydro <- st_read(dsn = "data-raw/dbmapdo.gpkg", layer = "bassin_hydrographique")
 region_hydro <- st_read(dsn = "data-raw/dbmapdo.gpkg", layer = "region_hydrographique")
 roe <- st_read(dsn = "data-raw/dbmapdo.gpkg", layer = "roe")

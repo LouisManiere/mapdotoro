@@ -287,13 +287,30 @@ network_landcover_continuity_metrics <- network_strahler_id %>%
                                     active_channel_width /
                                     valley_bottom_width))
 
+# add landcover and continuity % columns
+metric_in_percent <- c( "Crops", "Dense_Urban", "Diffuse_Urban",
+                        "Forest", "Grassland", "Gravel_Bars",
+                        "Infrastructures", "Natural_Open",
+                        "Water_Channel", "Active_channel",
+                        "Built_environment","Disconnected", "Reversible",
+                        "Riparian_corridor","Semi_natural")
+
+for (metric in metric_in_percent){
+  col_name <- paste0(metric,"_pc")
+  network_landcover_continuity_metrics <- network_landcover_continuity_metrics %>%
+    mutate({{col_name}} := ifelse(is.na(!!sym(metric)) |
+                                           is.na(sum_area) |
+                                           sum_area == 0, NA,
+                                         !!sym(metric) /
+                                           sum_area*100))
+}
 
 
 # write final network dataset
 st_write(network_landcover_continuity_metrics, "data-raw/network_landcover_continuity_metrics.gpkg", "network_landcover_continuity_metrics", append = FALSE)
 
 # read final network dataset
-network_landcover_metrics <- st_read("data-raw/network_landcover_continuity_metrics.gpkg")
+network_landcover_continuity_metrics <- st_read("data-raw/network_landcover_continuity_metrics.gpkg")
 
 ### AXIS
 
