@@ -41,6 +41,12 @@ SET gid_region = rh.gid
 FROM region_hydrographique AS rh
 WHERE ST_Within(nm.geom, rh.geom);
 
+-- add foreign key with region hydrographique on gid_region
+ALTER TABLE roe
+ADD CONSTRAINT fk_roe_gid_region
+FOREIGN KEY(gid_region)
+REFERENCES region_hydrographique(gid);
+
 -- création d'un index sur gid_region
 CREATE INDEX idx_gid_region_roe
 ON roe USING btree(gid_region);
