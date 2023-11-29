@@ -208,3 +208,5 @@ data-raw/continuity.csv
 data-raw/landcover.csv
 data-raw/metrics.csv
 data-raw/network.gpkg
+.Rdata
+.quarto
